@@ -1,3 +1,6 @@
+from maze_loader import WALL_EAST, WALL_SOUTH
+
+
 WALL = "█"
 EMPTY = " "
 PATH = "•"
@@ -5,7 +8,7 @@ ENTRY = "E"
 EXIT = "X"
 
 
-def build_grid(maze, path=None):
+def build_grid(maze, path):
     w = maze.width * 2 + 1
     h = maze.height * 2 + 1
 
@@ -22,12 +25,12 @@ def build_grid(maze, path=None):
 
             # east
             if x + 1 < maze.width:
-                if not (maze.grid[y][x] & 2):
+                if not (maze.grid[y][x] & WALL_EAST):
                     grid[ry][rx + 1] = EMPTY
 
             # south
             if y + 1 < maze.height:
-                if not (maze.grid[y][x] & 4):
+                if not (maze.grid[y][x] & WALL_SOUTH):
                     grid[ry + 1][rx] = EMPTY
 
     # draw path
