@@ -1,6 +1,5 @@
 import os
 import sys
-import json
 import random
 
 from maze_loader import load_maze
@@ -9,7 +8,6 @@ from maze_output import build_grid
 
 # Colors
 RESET = "\033[0m"
-BOLD = "\033[1m"
 
 def fg(r, g, b):
     return "\033[38;2;{};{};{}m".format(r, g, b)
@@ -20,7 +18,7 @@ def bg(r, g, b):
 def clear():
     os.system("clear")
 
-# Themes
+
 THEMES = [
     {
         "name": "Blue",
@@ -48,7 +46,6 @@ THEMES = [
     },
 ]
 
-# Render maze
 def render_maze(maze, theme_index, show_path, path):
     theme = THEMES[theme_index]
 
@@ -66,10 +63,10 @@ def render_maze(maze, theme_index, show_path, path):
                 result += fg(*theme["wall"]) + bg(*theme["wall"]) + "██"
 
             elif cell == "E":
-                result += fg(*theme["entry"]) + bg(*theme["empty"]) + BOLD + "EN"
+                result += fg(*theme["entry"]) + bg(*theme["empty"]) + "EN"
 
             elif cell == "X":
-                result += fg(*theme["exit"]) + bg(*theme["empty"]) + BOLD + "EX"
+                result += fg(*theme["exit"]) + bg(*theme["empty"]) + "EX"
 
             elif cell == "•":
                 result += fg(*theme["path"]) + bg(*theme["empty"]) + "··"
@@ -83,36 +80,13 @@ def render_maze(maze, theme_index, show_path, path):
 
     return result
 
-# Menu
+
 def print_menu():
     print("-" * 40)
     print("  1. Regenerate maze")
     print("  2. Show / Hide path")
     print("  3. Change maze color")
     print("  4. Quit")
-
-
-# Config
-def write_config(config_path, maze_file, theme_name, show_path, path, directions):
-    data = {
-        "maze_file": maze_file,
-        "theme": theme_name,
-        "show_path": show_path,
-        "solution": {
-            "directions": directions,
-            "steps": len(directions) if directions else 0,
-            "path_coords": path if path else []
-        }
-    }
-
-    with open(config_path, "w") as f:
-        json.dump(data, f, indent=2)
-
-def read_config(config_path):
-    if config_path and os.path.exists(config_path):
-        with open(config_path) as f:
-            return json.load(f)
-    return {}
 
 
 def main():
@@ -142,7 +116,6 @@ def main():
     while True:
         clear()
         print(render_maze(maze, theme_index, show_path, path))
-        print()
 
         print_menu()
 
@@ -152,11 +125,6 @@ def main():
         if choice == "1":
             maze = load_maze(maze_file)
             path = bfs_solve(maze)
-
-            if path:
-                directions = path_to_directions(path)
-            else:
-                directions = ""
 
         # 2. show/hide the path
         elif choice == "2":
