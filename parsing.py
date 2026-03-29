@@ -2,16 +2,14 @@ from pydantic import BaseModel, Field, model_validator
 from typing import Optional
 
 
-# 5ass n3rf limit li ma5assch yfoto lvalues f Field (example lwidth matfotch 15 etc...)
 class Config(BaseModel):
-    Width: int = Field(ge=0)
-    Height: int = Field(ge=0)
-    # + wech coordinates y9dro ykono negative ?
+    Width: int = Field(ge=2)
+    Height: int = Field(ge=2)
     Entry: tuple[int, int]
     Exit: tuple[int, int]
     Output_file: str
     Perfect: bool
-    Seed: Optional[int]
+    Seed: Optional[int] = None
 
     @model_validator(mode='after')
     def validator(self) -> "Config":
@@ -20,7 +18,6 @@ class Config(BaseModel):
         return self
 
 
-# entry w exit kaytvalidaw manual
 def entry_exit_validator(entry: str, exit: str) -> dict | None:
     entry_check: list = entry.split(',')
     if len(entry_check) != 2:
@@ -44,7 +41,6 @@ def entry_exit_validator(entry: str, exit: str) -> dict | None:
             'exit': exit_check}
 
 
-# tahadi manual
 def perfect_validator(perfect: str) -> bool | None:
     if perfect == "True":
         return True
@@ -58,9 +54,7 @@ def comments_remover(lines: list) -> list:
     return [line for line in lines if line[0] != '#']
 
 
-#  ila wslatk config == valid | ila wsl str ra kayn error f config
-#  parser kaya5od smia dyal file as an argument (at5dem b argv)
-def parser(config_file: str) -> Config | str:
+def parser(config_file: str) -> Config | None:
     """ basic parameters that should be in a config file """
     mandatory_keys = {
         "WIDTH": False,
