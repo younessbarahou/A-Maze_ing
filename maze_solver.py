@@ -3,6 +3,7 @@ from typing import List, Optional
 from maze_loader import WALL_NORTH, WALL_EAST, WALL_SOUTH, WALL_WEST
 from maze_loader import Maze
 
+
 DIRECTIONS = [
     ("N", 0, -1, WALL_NORTH),
     ("E", 1, 0, WALL_EAST),
@@ -12,7 +13,16 @@ DIRECTIONS = [
 
 
 def bfs_solve(maze: Maze) -> Optional[List[tuple[int, int]]]:
+    """Solves the maze using Breadth-First Search (BFS)
+    and returns the solution path.
 
+    Args:
+        maze (Maze): The maze object containing grid, entry, and exit.
+
+    Returns:
+        Optional[List[tuple[int, int]]]: List of coordinates (x, y)
+        from entry to exit if a solution exists; otherwise, None.
+    """
     start = maze.entry
     goal = maze.exit
 
@@ -52,7 +62,16 @@ def build_path(
     parent: dict[tuple[int, int], Optional[tuple[int, int]]],
     goal: tuple[int, int],
 ) -> List[tuple[int, int]]:
+    """Reconstructs the path from the BFS parent dictionary.
 
+    Args:
+        parent (Dict[tuple[int, int], Optional[tuple[int, int]]])
+            cell to its parent cell in the BFS tree.
+        goal (tuple[int, int]): Coordinates (x, y) of the goal cell.
+
+    Returns:
+        List[tuple[int, int]]: Ordered list of coordinates from start to goal.
+    """
     path: List[tuple[int, int]] = []
     current: Optional[tuple[int, int]] = goal
 
@@ -65,6 +84,19 @@ def build_path(
 
 
 def path_to_directions(path: List[tuple[int, int]]) -> str:
+    """Converts a list of path coordinates into directional letters.
+
+    Each step in the path is converted to a corresponding direction symbol
+    according to the DIRECTIONS mapping (e.g., 'N', 'S', 'E', 'W').
+
+    Args:
+        path (List[tuple[int, int]]): Ordered list of coordinates
+        representing a path.
+
+    Returns:
+        str: String of directional letters representing
+        the moves from start to goal.
+    """
     result = ""
 
     for i in range(len(path) - 1):

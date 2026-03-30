@@ -11,6 +11,7 @@ debug:
  
 clean:
 	rm -rf __pycache__ .mypy_cache .pytest_cache
+	rm -rf mazegen/__pycache__
 	rm -f *.pyc *.pyo
  
 lint:

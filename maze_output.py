@@ -14,6 +14,24 @@ def build_grid(
     maze: Maze,
     path: Optional[List[tuple[int, int]]]
 ) -> List[List[str]]:
+    """Builds a 2D string representation of the maze including walls,
+    empty cells, and optional path.
+
+    The resulting grid doubles the maze dimensions to account for
+    walls between cells.
+    Optionally marks a path through the maze if provided.
+
+    Args:
+        maze (Maze): The maze object containing the grid, entry, and exit.
+        path (Optional[List[tuple[int, int]]]): List of (x, y)
+        coordinates representing the solution path.
+            If None, no path is drawn.
+
+    Returns:
+        List[List[str]]: A 2D list of strings representing
+        the maze with walls, empty cells, entry, exit,
+            and path markers.
+    """
     w = maze.width * 2 + 1
     h = maze.height * 2 + 1
 
@@ -68,6 +86,21 @@ def print_maze(
     maze: Maze,
     path: Optional[List[tuple[int, int]]]
 ) -> None:
+    """Prints the maze to the console as a grid of characters.
+
+    Uses `build_grid` to generate the 2D grid including walls,
+    empty cells, entry, exit,
+    and an optional path, then prints it row by row.
+
+    Args:
+        maze (Maze): The maze object containing the grid, entry, and exit.
+        path (Optional[List[tuple[int, int]]]): List of (x, y)
+        coordinates representing the solution path.
+            If None, no path is printed.
+
+    Returns:
+        None
+    """
     grid = build_grid(maze, path)
 
     for row in grid:

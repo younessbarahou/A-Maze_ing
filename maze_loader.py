@@ -8,11 +8,29 @@ WALL_WEST = 8
 
 
 class Maze:
+    """Represents a 2D maze with entry and exit points.
+
+    Attributes:
+        width (int): Width of the maze grid.
+        height (int): Height of the maze grid.
+        grid (List[List[int]]): 2D list representing the maze layout.
+        entry (Tuple[int, int]): Coordinates (x, y) of the maze entry point.
+        exit (Tuple[int, int]): Coordinates (x, y) of the maze exit point.
+    """
     def __init__(
         self, width: int,
         height: int, grid: List[list[int]], entry: Tuple[int, int],
         exit_: Tuple[int, int]
     ):
+        """Initializes a Maze object with dimensions, grid, entry, and exit.
+
+        Args:
+            width (int): Width of the maze grid.
+            height (int): Height of the maze grid.
+            grid (List[List[int]]): 2D list of integers.
+            entry (Tuple[int, int]): (x, y) coordinates entry point.
+            exit_ (Tuple[int, int]): (x, y) coordinates exit point.
+        """
         self.width = width
         self.height = height
         self.grid = grid
@@ -21,8 +39,16 @@ class Maze:
 
 
 def load_maze(filename: str) -> Maze:
-    """
-    Load maze from file
+    """Loads a maze from a text file and constructs a Maze object.
+
+    The file format should contain the maze grid as hexadecimal digits followed
+    by an empty line, and then the entry and exit coordinates (x,y).
+
+    Args:
+        filename (str): Path to the maze file to load.
+
+    Returns:
+        Maze: A Maze object representing maze with entry and exit points.
     """
 
     with open(filename, "r") as f:

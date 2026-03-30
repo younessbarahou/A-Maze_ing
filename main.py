@@ -13,14 +13,43 @@ RESET = "\033[0m"
 
 
 def fg(r: int, g: int, b: int) -> str:
+    """Returns an ANSI escape sequence string to
+    set the foreground (text) color.
+
+    Args:
+        r (int): Red component (0-255).
+        g (int): Green component (0-255).
+        b (int): Blue component (0-255).
+
+    Returns:
+        str: ANSI escape sequence for the specified foreground color.
+    """
     return "\033[38;2;{};{};{}m".format(r, g, b)
 
 
 def bg(r: int, g: int, b: int) -> str:
+    """Returns an ANSI escape sequence string to set the background color.
+
+    Args:
+        r (int): Red component (0-255).
+        g (int): Green component (0-255).
+        b (int): Blue component (0-255).
+
+    Returns:
+        str: ANSI escape sequence for the specified background color.
+    """
     return "\033[48;2;{};{};{}m".format(r, g, b)
 
 
 def clear() -> None:
+    """Clears the terminal screen using the system's clear command.
+
+    This function works on Unix-like systems where the 'clear'
+    command is available.
+
+    Returns:
+        None
+    """
     os.system("clear")
 
 
@@ -58,6 +87,18 @@ def render_maze(
         show_path: bool,
         path: Optional[List[tuple[int, int]]]
 ) -> str:
+    """Renders the maze as a string with colors and optional solution path.
+
+    Args:
+        maze (Maze): The maze object to render.
+        theme_index (int): Index of the color THEMES.
+        show_path (bool): Whether to display the solution path in the maze.
+        path (Optional[List[tuple[int, int]]]): coordinates representing
+            the solution path. Ignored if `show_path` is False.
+
+    Returns:
+        str: A string representation of the maze with ANSI color codes applied.
+    """
     theme = THEMES[theme_index]
 
     if show_path:
@@ -93,6 +134,14 @@ def render_maze(
 
 
 def print_menu() -> None:
+    """Prints the main menu options for the maze program.
+
+    The menu includes options to regenerate the maze, toggle path display,
+    change the maze color theme, or quit the program.
+
+    Returns:
+        None
+    """
     print("-" * 40)
     print("  1. Regenerate maze")
     print("  2. Show / Hide path")
@@ -101,7 +150,19 @@ def print_menu() -> None:
 
 
 def main() -> None:
+    """Main entry point for the maze program.
 
+    Handles:
+        - Loading configuration from 'config.txt'.
+        - Generating the maze and saving it to a file.
+        - Solving the maze using BFS and recording the directions.
+        - Displaying the maze in the terminal with optional color themes.
+        - Interactive menu for regenerating the maze, toggling the path,
+          changing colors, or quitting.
+
+    Returns:
+        None
+    """
     maze_confg = parser("config.txt")
     maze_obj = MazeGenerator(
         height=maze_confg.Height,
