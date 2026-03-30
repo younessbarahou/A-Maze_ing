@@ -30,7 +30,7 @@ make install
 ### Running the Program
 
 # Run with a configuration file
-python3 a_maze_ing.py config.txt
+python3 main.py config.txt
 
 # Or via Makefile
 make run
@@ -55,8 +55,7 @@ Lines beginning with `#` are treated as comments and ignored.
 ### Optional Keys
 
 
-| `SEED` | Random seed for reproducibility | `SEED=42` |
-| `ALGORITHM` | Generation algorithm (`dfs`, `prim`, etc.) | `ALGORITHM=dfs` |
+| `SEED` | Random seed for reproducibility | `SEED=42` 
 
 ### Example `config.txt`
 
@@ -114,18 +113,16 @@ EESSSSEENNE...
 
 ### Algorithm: DFS Recursive Backtracker
 
-We chose the **Depth-First Search (DFS) recursive backtracker** as our primary generation algorithm.
+We chose the **Depth-First Search (DFS) recursive backtracker** as our generation algorithm.
 
 #### How It Works
 
-1. Start at the ENTRY cell; mark it as visited.
-2. Randomly choose an unvisited neighbor.
-3. Remove the wall between the current cell and the chosen neighbor.
-4. Recursively repeat from the neighbor.
-5. When no unvisited neighbors remain, **backtrack** to the previous cell.
-6. Continue until all cells have been visited.
-
-This naturally produces a **spanning tree** of the grid — a perfect maze.
+1. Initialize the 0,0 in a stack
+2. Choose A random valid direction
+3. Sets the Current cell's Wall + its parallel as opened
+4. Move to the next chosen Cell (push it to the stack)
+5. if there are no next valid directions , pop the last item from the stack
+6. Keep doing [2->5] until no item left on the stack
 
 #### Why DFS?
 
@@ -133,7 +130,6 @@ This naturally produces a **spanning tree** of the grid — a perfect maze.
 - **Long, winding corridors:** DFS tends to create aesthetically pleasing mazes with long passages and few dead ends.
 - **Simple implementation:** The algorithm maps cleanly to a stack-based or recursive approach, making it easy to maintain and reason about.
 - **Reproducible via seed:** Using Python's `random.seed()` makes mazes fully reproducible from a given seed.
-- **Real-world relevance:** The DFS backtracker is equivalent to building a random spanning tree — the same structure used in network routing and procedural content generation.
 
 #### Solving: BFS Shortest Path
 
@@ -151,27 +147,23 @@ BFS is optimal for unweighted graphs — it always finds the shortest path, whic
 
 ## Reusable Module
 
-The maze generation logic is packaged as a standalone installable Python module: **`mazegen`**.
+The maze generation logic is packaged as a standalone installable Python module:
 
 
 ```python
-from mazegen import MazeGenerator
+import MazeGenerator
 
 # Basic usage
-gen = MazeGenerator(width=20, height=15, seed=42, perfect=True)
-gen.generate(entry=(0, 0), exit=(19, 14))
+gen = MazeGenerator(height=15, width=20, entry=(0, 0), exit=(1, 1), output_file='output.txt', perfect=True, seed=42)
 
-# Access the grid (2D list of hex-encoded integers)
-grid = gen.grid          # grid[row][col] → int 0–15
+# This will create an output file with the maze generated represented as hexadecimal
+gen.generate_maze()
+
 
 # Access the solution path
 path = gen.solution      # List of (x, y) tuples
 directions = gen.path_directions()  # List of 'N', 'E', 'S', 'W'
 
-# Regenerate with a different seed
-gen.seed = 99
-gen.generate(entry=(0, 0), exit=(19, 14))
-```
 
 
 
@@ -186,16 +178,21 @@ gen.generate(entry=(0, 0), exit=(19, 14))
 
 
 
+### roles of each team member
 
+- <ybarahou>: + DFS algorithm implementation for the maze generation
+              + Parsing of the config file
+              + Format the maze output as hexadecimal representation
+- <mjoukhal>: + BFS algorithm implementation for the maze solution path
+              + Maze Visualisation + Menu
+              + MakeFile
 ### What Worked Well
 
 - Splitting generation and solving between team members allowed parallel development with a clean interface boundary (the shared grid format).
-- Using a fixed bitmask encoding for walls from the start avoided mismatches between generation and output.
 - The DFS algorithm was straightforward to implement and debug.
 
 ### What Could Be Improved
 
-- The "42" pattern placement required significant back-and-forth; defining a clearer specification earlier would have saved time.
 - Integration testing between Person A's generator and Person B's solver could have started earlier.
 
 ### Tools Used
@@ -217,7 +214,7 @@ gen.generate(entry=(0, 0), exit=(19, 14))
 - [Think Labyrinth — Walter D. Pullen](https://www.astrolog.org/labyrnth/algrithm.htm) — comprehensive reference on maze algorithms
 
 ### Python & Packaging
-
+- [Python `pydantic` module documentation](https://docs.pydantic.dev/latest/)
 - [Python `typing` module documentation](https://docs.python.org/3/library/typing.html)
 - [PEP 257 — Docstring Conventions](https://peps.python.org/pep-0257/)
 - [Python Packaging User Guide](https://packaging.python.org/en/latest/)
@@ -226,6 +223,4 @@ gen.generate(entry=(0, 0), exit=(19, 14))
 
 ### AI Usage
 
-AI tools (Claude, ChatGPT) were used for the following tasks during this project:
-
-All AI-generated content was reviewed, tested, and understood before being included in the project. No AI-generated code was submitted without full comprehension by the team.
+AI tools (Claude, ChatGPT) were used for understanding how we can implement the algorithms to generate and solve the maze.
