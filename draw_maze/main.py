@@ -1,25 +1,30 @@
 import os
-import sys
 import random
-
-from maze_loader import load_maze
+from typing import List, Dict, Tuple, Optional
+from parsing import parser
+from generator import MazeGenerator
+from maze_loader import load_maze, Maze
 from maze_solver import bfs_solve, path_to_directions
 from maze_output import build_grid
+
 
 # Colors
 RESET = "\033[0m"
 
-def fg(r, g, b):
+
+def fg(r: int, g: int, b: int) -> str:
     return "\033[38;2;{};{};{}m".format(r, g, b)
 
-def bg(r, g, b):
+
+def bg(r: int, g: int, b: int) -> str:
     return "\033[48;2;{};{};{}m".format(r, g, b)
 
-def clear():
+
+def clear() -> None:
     os.system("clear")
 
 
-THEMES = [
+THEMES: List[Dict[str, Tuple[int, int, int] | str]] = [
     {
         "name": "Blue",
         "wall": (30, 30, 80),
@@ -46,7 +51,13 @@ THEMES = [
     },
 ]
 
-def render_maze(maze, theme_index, show_path, path):
+
+def render_maze(
+        maze: Maze,
+        theme_index: int,
+        show_path: bool,
+        path: Optional[List[tuple[int, int]]]
+) -> str:
     theme = THEMES[theme_index]
 
     if show_path:
@@ -81,7 +92,7 @@ def render_maze(maze, theme_index, show_path, path):
     return result
 
 
-def print_menu():
+def print_menu() -> None:
     print("-" * 40)
     print("  1. Regenerate maze")
     print("  2. Show / Hide path")
@@ -89,8 +100,20 @@ def print_menu():
     print("  4. Quit")
 
 
-def main():
-    maze_file = sys.argv[1]
+def main() -> None:
+
+    maze_confg = parser("config.txt")
+    maze_obj = MazeGenerator(
+        height=maze_confg.Height,
+        width=maze_confg.Width,
+        entry=maze_confg.Entry,
+        exitt=maze_confg.Exit,
+        output_file=maze_confg.Output_file,
+        perfect=maze_confg.Perfect,
+        seed=maze_confg.Seed
+    )
+    maze_obj.generate_maze()
+    maze_file = "output.txt"
     show_path = False
 
     # Find saved theme index
@@ -103,18 +126,14 @@ def main():
             break
 
     maze = load_maze(maze_file)
-    path = bfs_solve(maze)
+    path = bfs_solve(maze) or []
 
-    if path:
-        directions = path_to_directions(path)
-    else:
-        directions = ""
+    directions = path_to_directions(path)
 
     with open(maze_file, 'a') as f:
-            f.write(f'\n' + directions + '\n')
-
+        f.write('\n' + directions + '\n')
     while True:
-        clear()
+        # clear()
         print(render_maze(maze, theme_index, show_path, path))
 
         print_menu()
@@ -123,9 +142,12 @@ def main():
 
         # 1. Regenerate
         if choice == "1":
+            maze_obj.generate_maze()
             maze = load_maze(maze_file)
-            path = bfs_solve(maze)
-
+            path = bfs_solve(maze) or []
+            directions = path_to_directions(path)
+            with open(maze_file, 'a') as f:
+                f.write('\n' + directions + '\n')
         # 2. show/hide the path
         elif choice == "2":
             show_path = not show_path
