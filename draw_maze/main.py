@@ -110,7 +110,7 @@ def main() -> None:
         exitt=maze_confg.Exit,
         output_file=maze_confg.Output_file,
         perfect=maze_confg.Perfect,
-        seed=maze_confg.Seed
+        SEED=maze_confg.SEED
     )
     maze_obj.generate_maze()
     maze_file = "output.txt"
