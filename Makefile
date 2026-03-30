@@ -4,17 +4,14 @@ install:
 	pip install -r requirements.txt
  
 run:
-	python main.py
+	python3 main.py
  
 debug:
 	python -m pdb main.py
  
 clean:
-	find . -type d -name "__pycache__" -exec rm -rf {} +
-	find . -type d -name ".mypy_cache" -exec rm -rf {} +
-	find . -type d -name ".pytest_cache" -exec rm -rf {} +
-	find . -type f -name "*.pyc" -delete
-	find . -type f -name "*.pyo" -delete
+	rm -rf __pycache__ .mypy_cache .pytest_cache
+	rm -f *.pyc *.pyo
  
 lint:
 	flake8 .

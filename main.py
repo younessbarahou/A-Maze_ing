@@ -2,7 +2,7 @@ import os
 import random
 from typing import List, Dict, Tuple, Optional
 from parsing import parser
-from generator import MazeGenerator
+from mazegen.generator import MazeGenerator
 from maze_loader import load_maze, Maze
 from maze_solver import bfs_solve, path_to_directions
 from maze_output import build_grid
@@ -133,7 +133,7 @@ def main() -> None:
     with open(maze_file, 'a') as f:
         f.write('\n' + directions + '\n')
     while True:
-        # clear()
+        clear()
         print(render_maze(maze, theme_index, show_path, path))
 
         print_menu()
