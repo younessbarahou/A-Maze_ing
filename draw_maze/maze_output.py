@@ -1,4 +1,6 @@
 from maze_loader import WALL_EAST, WALL_SOUTH
+from typing import List, Optional
+from maze_loader import Maze
 
 
 WALL = "█"
@@ -8,7 +10,10 @@ ENTRY = "E"
 EXIT = "X"
 
 
-def build_grid(maze, path):
+def build_grid(
+    maze: Maze,
+    path: Optional[List[tuple[int, int]]]
+) -> List[List[str]]:
     w = maze.width * 2 + 1
     h = maze.height * 2 + 1
 
@@ -34,7 +39,7 @@ def build_grid(maze, path):
                     grid[ry + 1][rx] = EMPTY
 
     # draw path
-    if path:
+    if path is not None:
         for i in range(len(path)):
             x, y = path[i]
             rx = x * 2 + 1
@@ -59,7 +64,10 @@ def build_grid(maze, path):
     return grid
 
 
-def print_maze(maze, path=None):
+def print_maze(
+    maze: Maze,
+    path: Optional[List[tuple[int, int]]]
+) -> None:
     grid = build_grid(maze, path)
 
     for row in grid:
