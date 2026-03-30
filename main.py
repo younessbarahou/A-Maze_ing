@@ -165,16 +165,16 @@ def main() -> None:
     """
     maze_confg = parser("config.txt")
     maze_obj = MazeGenerator(
-        height=maze_confg.Height,
-        width=maze_confg.Width,
-        entry=maze_confg.Entry,
-        exitt=maze_confg.Exit,
-        output_file=maze_confg.Output_file,
-        perfect=maze_confg.Perfect,
-        SEED=maze_confg.SEED
+        maze_confg.Height,
+        maze_confg.Width,
+        maze_confg.Entry,
+        maze_confg.Exit,
+        maze_confg.Output_file,
+        maze_confg.Perfect,
+        maze_confg.SEED
     )
     maze_obj.generate_maze()
-    maze_file = "output.txt"
+    maze_file = maze_confg.Output_file
     show_path = False
 
     # Find saved theme index

@@ -3,6 +3,7 @@ from typing import Optional, Tuple, List, Dict
 
 
 class Config(BaseModel):
+    """ holds the valid parameters from config file """
     Width: int = Field(ge=2)
     Height: int = Field(ge=2)
     Entry: Tuple[int, int]
@@ -13,12 +14,14 @@ class Config(BaseModel):
 
     @model_validator(mode='after')
     def validator(self) -> "Config":
+        """ setting an additional validation """
         if self.Entry[0] == self.Exit[0] and self.Exit[1] == self.Entry[1]:
             raise ValueError("Entry should be different from Exit !")
         return self
 
 
 def entry_exit_validator(entry: str, exit: str) -> Dict[str, tuple[int, int]]:
+    """ validates both entry and exit parameters """
     entry_check: List[str] = entry.split(',')
     exit_check: List[str] = exit.split(',')
     entry_to_int: Tuple[int, int] = (-1, -1)
@@ -40,6 +43,7 @@ def entry_exit_validator(entry: str, exit: str) -> Dict[str, tuple[int, int]]:
 
 
 def perfect_validator(perfect: str) -> bool:
+    """ validate the perfect parameter """
     if perfect == "True":
         return True
     elif perfect == "False":
@@ -49,11 +53,12 @@ def perfect_validator(perfect: str) -> bool:
 
 
 def comments_remover(lines: List[str]) -> List[str]:
+    """ discards the comments """
     return [line for line in lines if line[0] != '#']
 
 
 def parser(config_file: str) -> Config:
-    """ basic parameters that should be in a config file """
+    """ parses and validate the parameters in the config file """
     mandatory_keys = {
         "WIDTH": False,
         "HEIGHT": False,
@@ -65,7 +70,6 @@ def parser(config_file: str) -> Config:
     optional_keys = {
         "SEED": False
     }
-    """ open and read config file """
     try:
         with open(config_file, 'r') as file:
             lines: List[str] = file.readlines()
@@ -75,13 +79,11 @@ def parser(config_file: str) -> Config:
             splitted_lines: List[List[str]] = list(
                 map(lambda x: x.split("=", 1), lines_no_cmt)
             )
-            """ check for x=y pattern validation """
             for line in splitted_lines:
                 if len(line) != 2 or line[0] == "" or line[1] == "":
                     raise ValueError(f"Invalid parameter '{line[0].strip()}'")
                 line[0] = line[0].strip()
                 line[1] = line[1].strip()
-            """ check mandatory parameters """
             lines_dict: Dict[str, str] = {
                 line[0]: line[1] for line in splitted_lines}
             for key in lines_dict:
@@ -91,17 +93,14 @@ def parser(config_file: str) -> Config:
                     optional_keys[key] = True
                 else:
                     raise ValueError(f"{key} is not a valid parameter!")
-            """ we check if a mandatory key is missing """
             missing_keys: List[str] = [
                 k for k in mandatory_keys if mandatory_keys[k] is False]
             if len(missing_keys) > 0:
                 raise ValueError(
                     f"Parameters are missing: {','.join(missing_keys)}")
-            """ check parameter's values manual for entry and exit """
             entry_exit: Dict[str, tuple[int, int]] = entry_exit_validator(
                 lines_dict['ENTRY'], lines_dict['EXIT'])
             perfect: bool = perfect_validator(lines_dict['PERFECT'])
-            """ casting width and height """
             try:
                 width_int: int = int(lines_dict['WIDTH'])
             except ValueError:
@@ -110,13 +109,11 @@ def parser(config_file: str) -> Config:
                 height_int: int = int(lines_dict['HEIGHT'])
             except ValueError:
                 raise ValueError("Height should be a valid integer!")
-            """ checking if seed is integer"""
             if 'SEED' in lines_dict:
                 try:
                     seed_result: int | None = int(lines_dict['SEED'])
                 except ValueError:
                     raise ValueError("Seed should be a valid integer!")
-            """ setting the data product """
             final_validation: Config = Config(
                 Width=width_int,
                 Height=height_int,

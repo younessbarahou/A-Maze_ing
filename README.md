@@ -154,7 +154,8 @@ The maze generation logic is packaged as a standalone installable Python module:
 import MazeGenerator
 
 # Basic usage
-gen = MazeGenerator(height=15, width=20, entry=(0, 0), exit=(1, 1), output_file='output.txt', perfect=True, seed=42)
+'gen = MazeGenerator(Height, width, entry, exit, output_file, perfect maze, seed)'
+gen = MazeGenerator(15, 20, (0, 0), (1, 1), 'output.txt', True, 42)
 
 # This will create an output file with the maze generated represented as hexadecimal
 gen.generate_maze()

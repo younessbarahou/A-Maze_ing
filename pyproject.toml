@@ -1,5 +1,0 @@
-[project]
-name = "mazegen"
-version = "0.0.1"
-description = "Maze Generator"
-requires-python = ">=3.10"

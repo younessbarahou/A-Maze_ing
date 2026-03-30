@@ -4,7 +4,9 @@ from random import seed, choice, randint
 
 
 class Cell:
+    """ This class represents the smallest unit in a maze which is a cell """
     def __init__(self) -> None:
+        """ initialize a cell """
         self.north: bool = True
         self.east: bool = True
         self.west: bool = True
@@ -16,12 +18,15 @@ class Cell:
 
 
 class Maze:
+    """ This class represents the maze that holds the cells as a part of it """
     def __init__(self, rows: int, columns: int) -> None:
+        """ initialize a maze """
         self.rows = rows
         self.columns = columns
         self.maze_rep: List[List[Cell]] = []
 
     def grid_setup(self) -> List[List[Cell]]:
+        """ Generates the initial grid of the maze """
         index: int = 0
         while index < self.rows:
             jndex: int = 0
@@ -35,10 +40,11 @@ class Maze:
         return self.maze_rep
 
 
-""" To generate a maze , use the generate_maze() method """
-
-
 class MazeGenerator:
+    """ This class is the main responsible of generating a maze
+    To Generate a maze:
+    => create a MazeGenerator object
+    => use its method generate_maze() """
     def __init__(
         self,
         height: int,
@@ -49,6 +55,7 @@ class MazeGenerator:
         perfect: bool,
         SEED: Optional[int] = None
     ) -> None:
+        """ initialize a maze generator"""
         self.height = height
         self.width = width
         self.entry = entry
@@ -58,6 +65,7 @@ class MazeGenerator:
         self.SEED = SEED
 
     def to_hexa(self, maze_grid: List[List[Cell]]) -> str:
+        """ converts the result matrix to a hexadecimal representation """
         hexa_present: str = "0123456789ABCDEF"
         result: str = ""
         for row in maze_grid:
@@ -71,6 +79,7 @@ class MazeGenerator:
         return result
 
     def check_borders(self) -> None:
+        """ checks if the entry and exit are inside the maze """
         if (
             self.entry[0] < 0
             or self.entry[1] < 0
@@ -90,6 +99,7 @@ class MazeGenerator:
         self,
         maze_grid: List[List[Cell]]
     ) -> None:
+        """ Sets the 42 pattern in the maze"""
         if self.height < 12 or self.width < 12:
             print(
                 "42 Pattern is omitted!\n maze size is too small.",
@@ -115,15 +125,15 @@ class MazeGenerator:
             maze_grid[6][7].reserved_42 = True
             maze_grid[6][8].reserved_42 = True
 
-    """ makes the perfect maze imperfect """
     def make_imperfect(
         self, maze_grid: List[List[Cell]],
         rows: int, columns: int
     ) -> None:
-        """ we get the 10% of a grid """
+        """ breaks 10% of grid walls so it opens more paths
+        from the entry to the exit
+        making the maze imperfect """
         ten_percent = (rows * columns) // 10
         while ten_percent > 0:
-            """ we select random cell """
             rand_row = randint(0, rows - 2)
             rand_col = randint(0, columns - 2)
             east = maze_grid[rand_row][rand_col].east
@@ -145,26 +155,21 @@ class MazeGenerator:
                 maze_grid[rand_row + 1][rand_col].north = False
                 ten_percent -= 1
 
-    """ Main method for maze generation """
     def generate_maze(self) -> None:
+        """ Checks the validity of entry and exit ,
+        and generates a maze using dfs algorithm """
         if self.SEED is not None:
             seed(self.SEED)
         sample_maze: Maze = Maze(self.height, self.width)
         maze_grid: List[List[Cell]] = sample_maze.grid_setup()
-        """ mark the 42 cells """
         self.mark_42(maze_grid)
-        """ checking if entry | exit are out of maze borders """
         self.check_borders()
-        """ check if entry | exit are in the 42 pattern """
         if maze_grid[self.entry[0]][self.entry[1]].reserved_42 is True:
             raise ValueError("Entry coordinates are in 42 pattern!")
         if maze_grid[self.exit[0]][self.exit[1]].reserved_42 is True:
             raise ValueError("Exit coordinates are in 42 pattern!")
-        """ mark the entry cell """
         maze_grid[self.entry[0]][self.entry[1]].entry = True
-        """ mark the exit cell """
         maze_grid[self.exit[0]][self.exit[1]].exit = True
-        """ starting the implementation of dfs algorithm """
         base_row: int = 0
         base_column: int = 0
         stack_holder: List[Tuple[int, int]] = [(base_row, base_column)]
@@ -207,10 +212,8 @@ class MazeGenerator:
                     east = (row, column + 1)
                 possible_dir: List[Tuple[int, int]] = [
                     north, south, east, west]
-                """ filter the Valid directions """
                 possible_dir = [p for p in possible_dir if p[0] != -1]
                 decision = choice(possible_dir)
-                """ Walls Opening """
                 if decision == north:
                     maze_grid[row][column].north = False
                     maze_grid[decision[0]][decision[1]].south = False
@@ -233,6 +236,7 @@ class MazeGenerator:
         if self.perfect is False:
             self.make_imperfect(maze_grid, self.height, self.width)
         try:
+            """ writing the result into the output file"""
             with open(self.o_file, 'w') as file:
                 file.write(self.to_hexa(maze_grid))
                 file.write('\n')
@@ -241,3 +245,5 @@ class MazeGenerator:
         except PermissionError:
             raise PermissionError(
                 f"Failed to produce {self.o_file}! Permission error")
+        except FileNotFoundError:
+            raise FileNotFoundError("File Name Can not be empty !")
