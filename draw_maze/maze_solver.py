@@ -1,5 +1,7 @@
 from collections import deque
+from typing import List, Optional
 from maze_loader import WALL_NORTH, WALL_EAST, WALL_SOUTH, WALL_WEST
+from maze_loader import Maze
 
 DIRECTIONS = [
     ("N", 0, -1, WALL_NORTH),
@@ -9,13 +11,15 @@ DIRECTIONS = [
 ]
 
 
-def bfs_solve(maze):
+def bfs_solve(maze: Maze) -> Optional[List[tuple[int, int]]]:
+
     start = maze.entry
     goal = maze.exit
 
     queue = deque([start])
-    visited = set([start])
-    parent = {start: None}
+    visited = {start}
+
+    parent: dict[tuple[int, int], Optional[tuple[int, int]]] = {start: None}
 
     while queue:
         x, y = queue.popleft()
@@ -44,9 +48,13 @@ def bfs_solve(maze):
     return None
 
 
-def build_path(parent, goal):
-    path = []
-    current = goal
+def build_path(
+    parent: dict[tuple[int, int], Optional[tuple[int, int]]],
+    goal: tuple[int, int],
+) -> List[tuple[int, int]]:
+
+    path: List[tuple[int, int]] = []
+    current: Optional[tuple[int, int]] = goal
 
     while current is not None:
         path.append(current)
@@ -56,7 +64,7 @@ def build_path(parent, goal):
     return path
 
 
-def path_to_directions(path):
+def path_to_directions(path: List[tuple[int, int]]) -> str:
     result = ""
 
     for i in range(len(path) - 1):
