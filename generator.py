@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Tuple, List
 from sys import stderr
 from random import seed, choice, randint
 
@@ -19,13 +19,13 @@ class Maze:
     def __init__(self, rows: int, columns: int) -> None:
         self.rows = rows
         self.columns = columns
-        self.maze_rep: list[list] = []
+        self.maze_rep: List[List[Cell]] = []
 
-    def grid_setup(self) -> list[list]:
+    def grid_setup(self) -> List[List[Cell]]:
         index: int = 0
         while index < self.rows:
             jndex: int = 0
-            row: list = []
+            row: List[Cell] = []
             while jndex < self.columns:
                 temp: Cell = Cell()
                 row.append(temp)
@@ -43,11 +43,11 @@ class MazeGenerator:
         self,
         height: int,
         width: int,
-        entry: tuple,
-        exitt: tuple,
+        entry: Tuple[int, int],
+        exitt: Tuple[int, int],
         output_file: str,
         perfect: bool,
-        seed: Optional[int] = None
+        SEED: Optional[int] = None
     ) -> None:
         self.height = height
         self.width = width
@@ -55,17 +55,17 @@ class MazeGenerator:
         self.exit = exitt
         self.o_file = output_file
         self.perfect = perfect
-        self.Seed = seed
+        self.SEED = SEED
 
-    def to_hexa(self, maze_grid: list[list]) -> list[list]:
+    def to_hexa(self, maze_grid: List[List[Cell]]) -> str:
         hexa_present: str = "0123456789ABCDEF"
         result: str = ""
         for row in maze_grid:
             for cell in row:
                 north: int = 1 if cell.north else 0
-                east: int = 2 if cell.east is True else 0
-                south: int = 4 if cell.south is True else 0
-                west: int = 8 if cell.west is True else 0
+                east: int = 2 if cell.east else 0
+                south: int = 4 if cell.south else 0
+                west: int = 8 if cell.west else 0
                 result += hexa_present[north + east + south + west]
             result += '\n'
         return result
@@ -86,7 +86,10 @@ class MazeGenerator:
         ):
             raise ValueError("exit coordinates out of maze bond!")
 
-    def mark_42(self, maze_grid: list[list]) -> list[list] | None:
+    def mark_42(
+        self,
+        maze_grid: List[List[Cell]]
+    ) -> None:
         if self.height < 12 or self.width < 12:
             print(
                 "42 Pattern is omitted!\n maze size is too small.",
@@ -111,11 +114,10 @@ class MazeGenerator:
             maze_grid[6][6].reserved_42 = True
             maze_grid[6][7].reserved_42 = True
             maze_grid[6][8].reserved_42 = True
-            return maze_grid
 
     """ makes the perfect maze imperfect """
     def make_imperfect(
-        self, maze_grid: list[list],
+        self, maze_grid: List[List[Cell]],
         rows: int, columns: int
     ) -> None:
         """ we get the 10% of a grid """
@@ -126,23 +128,31 @@ class MazeGenerator:
             rand_col = randint(0, columns - 2)
             east = maze_grid[rand_row][rand_col].east
             south = maze_grid[rand_row][rand_col].south
+            if (
+                maze_grid[rand_row][rand_col].reserved_42 or
+                (
+                    maze_grid[rand_row][rand_col + 1].reserved_42 and
+                    maze_grid[rand_row + 1][rand_col].reserved_42
+                )
+            ):
+                continue
             if east:
                 maze_grid[rand_row][rand_col].east = False
                 maze_grid[rand_row][rand_col + 1].west = False
+                ten_percent -= 1
             elif south:
                 maze_grid[rand_row][rand_col].south = False
                 maze_grid[rand_row + 1][rand_col].north = False
-            ten_percent -= 1
+                ten_percent -= 1
+
     """ Main method for maze generation """
     def generate_maze(self) -> None:
-        if self.Seed:
-            seed(self.Seed)
+        if self.SEED is not None:
+            seed(self.SEED)
         sample_maze: Maze = Maze(self.height, self.width)
-        maze_grid: list[dict] = sample_maze.grid_setup()
+        maze_grid: List[List[Cell]] = sample_maze.grid_setup()
         """ mark the 42 cells """
-        marked: list[list] | None = self.mark_42(maze_grid)
-        if marked is not None:
-            maze_grid = marked
+        self.mark_42(maze_grid)
         """ checking if entry | exit are out of maze borders """
         self.check_borders()
         """ check if entry | exit are in the 42 pattern """
@@ -157,13 +167,13 @@ class MazeGenerator:
         """ starting the implementation of dfs algorithm """
         base_row: int = 0
         base_column: int = 0
-        stack_holder: list = [(base_row, base_column)]
+        stack_holder: List[Tuple[int, int]] = [(base_row, base_column)]
         maze_grid[stack_holder[0][0]][stack_holder[0][1]].visited = True
         while stack_holder:
-            north: tuple = None
-            east: tuple = None
-            west: tuple = None
-            south: tuple = None
+            north: Tuple[int, int] = (-1, -1)
+            east: Tuple[int, int] = (-1, -1)
+            west: Tuple[int, int] = (-1, -1)
+            south: Tuple[int, int] = (-1, -1)
             row = stack_holder[-1][0]
             column = stack_holder[-1][1]
             north_check = (
@@ -195,11 +205,12 @@ class MazeGenerator:
                     west = (row, column - 1)
                 if east_check:
                     east = (row, column + 1)
-                possible_dir: list = [north, south, east, west]
-                """ filter the non-None directions """
-                possible_dir = [p for p in possible_dir if p is not None]
+                possible_dir: List[Tuple[int, int]] = [
+                    north, south, east, west]
+                """ filter the Valid directions """
+                possible_dir = [p for p in possible_dir if p[0] != -1]
                 decision = choice(possible_dir)
-                """ Walls destructing """
+                """ Walls Opening """
                 if decision == north:
                     maze_grid[row][column].north = False
                     maze_grid[decision[0]][decision[1]].south = False
@@ -221,8 +232,12 @@ class MazeGenerator:
                 stack_holder.pop()
         if self.perfect is False:
             self.make_imperfect(maze_grid, self.height, self.width)
-        with open(self.o_file, 'w') as file:
-            file.write(self.to_hexa(maze_grid))
-            file.write('\n')
-            file.write(f"{self.entry[0]},{self.entry[1]}\n")
-            file.write(f"{self.exit[0]},{self.exit[1]}\n")
+        try:
+            with open(self.o_file, 'w') as file:
+                file.write(self.to_hexa(maze_grid))
+                file.write('\n')
+                file.write(f"{self.entry[0]},{self.entry[1]}\n")
+                file.write(f"{self.exit[0]},{self.exit[1]}\n")
+        except PermissionError:
+            raise PermissionError(
+                f"Failed to produce {self.o_file}! Permission error")

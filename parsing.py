@@ -1,15 +1,15 @@
 from pydantic import BaseModel, Field, model_validator
-from typing import Optional
+from typing import Optional, Tuple, List, Dict
 
 
 class Config(BaseModel):
     Width: int = Field(ge=2)
     Height: int = Field(ge=2)
-    Entry: tuple[int, int]
-    Exit: tuple[int, int]
+    Entry: Tuple[int, int]
+    Exit: Tuple[int, int]
     Output_file: str
     Perfect: bool
-    Seed: Optional[int] = None
+    SEED: Optional[int] = None
 
     @model_validator(mode='after')
     def validator(self) -> "Config":
@@ -18,30 +18,28 @@ class Config(BaseModel):
         return self
 
 
-def entry_exit_validator(entry: str, exit: str) -> dict | None:
-    entry_check: list = entry.split(',')
+def entry_exit_validator(entry: str, exit: str) -> Dict[str, tuple[int, int]]:
+    entry_check: List[str] = entry.split(',')
+    exit_check: List[str] = exit.split(',')
+    entry_to_int: Tuple[int, int] = (-1, -1)
+    exit_to_int: Tuple[int, int] = (-1, -1)
     if len(entry_check) != 2:
         raise ValueError("Entry coordinates are not valid x,y!")
     try:
-        entry_check[0] = int(entry_check[0])
-        entry_check[1] = int(entry_check[1])
+        entry_to_int = (int(entry_check[0]), int(entry_check[1]))
     except ValueError:
         raise ValueError("Entry coordinates should be valid integers!")
-    exit_check = exit.split(',')
     if len(exit_check) != 2:
         raise ValueError("Exit coordinates are not valid x,y!")
     try:
-        exit_check[0] = int(exit_check[0])
-        exit_check[1] = int(exit_check[1])
+        exit_to_int = (int(exit_check[0]), int(exit_check[1]))
     except ValueError:
         raise ValueError("Exit coordinates should be valid integers!")
-    entry_check: tuple = tuple(entry_check)
-    exit_check: tuple = tuple(exit_check)
-    return {'entry': entry_check,
-            'exit': exit_check}
+    return {'entry': entry_to_int,
+            'exit': exit_to_int}
 
 
-def perfect_validator(perfect: str) -> bool | None:
+def perfect_validator(perfect: str) -> bool:
     if perfect == "True":
         return True
     elif perfect == "False":
@@ -50,11 +48,11 @@ def perfect_validator(perfect: str) -> bool | None:
         raise ValueError("Perfect parameter should be True/False!")
 
 
-def comments_remover(lines: list) -> list:
+def comments_remover(lines: List[str]) -> List[str]:
     return [line for line in lines if line[0] != '#']
 
 
-def parser(config_file: str) -> Config | None:
+def parser(config_file: str) -> Config:
     """ basic parameters that should be in a config file """
     mandatory_keys = {
         "WIDTH": False,
@@ -68,44 +66,67 @@ def parser(config_file: str) -> Config | None:
         "SEED": False
     }
     """ open and read config file """
-    with open(config_file, 'r') as file:
-        lines: list = file.readlines()
-        lines = comments_remover(lines)
-        if len(lines) == 0:
-            raise ValueError("Config file is empty !")
-        lines: list = list(map(lambda x: x.split("="), lines))
-        """ check for x=y pattern validation"""
-        for line in lines:
-            if len(line) != 2 or line[0] == "" or line[1] == "":
-                raise ValueError(f"Invalid parameter '{line[0].strip()}'")
-            line[0] = line[0].strip()
-            line[1] = line[1].strip()
-        """ check mandatory parameters """
-        lines_dict: dict = {line[0]: line[1] for line in lines}
-        for key in lines_dict:
-            if key in mandatory_keys:
-                mandatory_keys[key] = True
-            elif key in optional_keys:
-                optional_keys[key] = True
-            else:
-                raise ValueError(f"{key} is not a valid parameter!")
-        missing_keys: list = [
-            k for k in mandatory_keys if mandatory_keys[k] is False]
-        if len(missing_keys) > 0:
-            raise ValueError(
-                f"Parameters are missing: {','.join(missing_keys)}")
-        """ check parameter's values manual for entry and exit """
-        """ other parameters are checked automatic using pydantic"""
-        entry_exit = entry_exit_validator(
-            lines_dict['ENTRY'], lines_dict['EXIT'])
-        perfect = perfect_validator(lines_dict['PERFECT'])
-        """ setting the data product"""
-        final_validation: Config = Config(
-            Width=lines_dict['WIDTH'],
-            Height=lines_dict['HEIGHT'],
-            Entry=entry_exit['entry'],
-            Exit=entry_exit['exit'],
-            Output_file=lines_dict['OUTPUT_FILE'],
-            Perfect=perfect,
-            Seed=lines_dict['SEED'] if optional_keys['SEED'] else None)
-        return final_validation
+    try:
+        with open(config_file, 'r') as file:
+            lines: List[str] = file.readlines()
+            lines_no_cmt: List[str] = comments_remover(lines)
+            if len(lines_no_cmt) == 0:
+                raise ValueError("Config file is empty !")
+            splitted_lines: List[List[str]] = list(
+                map(lambda x: x.split("=", 1), lines_no_cmt)
+            )
+            """ check for x=y pattern validation """
+            for line in splitted_lines:
+                if len(line) != 2 or line[0] == "" or line[1] == "":
+                    raise ValueError(f"Invalid parameter '{line[0].strip()}'")
+                line[0] = line[0].strip()
+                line[1] = line[1].strip()
+            """ check mandatory parameters """
+            lines_dict: Dict[str, str] = {
+                line[0]: line[1] for line in splitted_lines}
+            for key in lines_dict:
+                if key in mandatory_keys:
+                    mandatory_keys[key] = True
+                elif key in optional_keys:
+                    optional_keys[key] = True
+                else:
+                    raise ValueError(f"{key} is not a valid parameter!")
+            """ we check if a mandatory key is missing """
+            missing_keys: List[str] = [
+                k for k in mandatory_keys if mandatory_keys[k] is False]
+            if len(missing_keys) > 0:
+                raise ValueError(
+                    f"Parameters are missing: {','.join(missing_keys)}")
+            """ check parameter's values manual for entry and exit """
+            entry_exit: Dict[str, tuple[int, int]] = entry_exit_validator(
+                lines_dict['ENTRY'], lines_dict['EXIT'])
+            perfect: bool = perfect_validator(lines_dict['PERFECT'])
+            """ casting width and height """
+            try:
+                width_int: int = int(lines_dict['WIDTH'])
+            except ValueError:
+                raise ValueError("Width should be a valid integer!")
+            try:
+                height_int: int = int(lines_dict['HEIGHT'])
+            except ValueError:
+                raise ValueError("Height should be a valid integer!")
+            """ checking if seed is integer"""
+            if 'SEED' in lines_dict:
+                try:
+                    seed_result: int | None = int(lines_dict['SEED'])
+                except ValueError:
+                    raise ValueError("Seed should be a valid integer!")
+            """ setting the data product """
+            final_validation: Config = Config(
+                Width=width_int,
+                Height=height_int,
+                Entry=entry_exit['entry'],
+                Exit=entry_exit['exit'],
+                Output_file=lines_dict['OUTPUT_FILE'],
+                Perfect=perfect,
+                SEED=seed_result if 'SEED' in lines_dict else None)
+            return final_validation
+    except FileNotFoundError:
+        raise FileNotFoundError("Config file is missing !")
+    except PermissionError:
+        raise PermissionError("Can not read config file (permission error)")
