@@ -173,7 +173,7 @@ class MazeGenerator:
         base_row: int = 0
         base_column: int = 0
         stack_holder: List[Tuple[int, int]] = [(base_row, base_column)]
-        maze_grid[stack_holder[0][0]][stack_holder[0][1]].visited = True
+        maze_grid[0][0].visited = True
         while stack_holder:
             north: Tuple[int, int] = (-1, -1)
             east: Tuple[int, int] = (-1, -1)
