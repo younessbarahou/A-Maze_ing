@@ -52,4 +52,3 @@ def load_maze(filename: str) -> Maze:
     entry: Tuple[int, int] = (ex, ey)
     exit_: Tuple[int, int] = (gx, gy)
     return Maze(width, height, grid, entry, exit_)
-    
