@@ -1,0 +1,10 @@
+[tool.poetry]
+name = "mazegen"
+version = "0.0.1"
+description = "MazeGenerator"
+
+[tool.poetry.dependencies]
+python = ">=3.10"
+pydantic = "*"
+mypy = "*"
+flake8 = "*"

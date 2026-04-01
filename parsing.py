@@ -111,7 +111,7 @@ def parser(config_file: str) -> Config:
                 raise ValueError("Height should be a valid integer!")
             if 'SEED' in lines_dict:
                 try:
-                    seed_result: int | None = int(lines_dict['SEED'])
+                    seed_result: int = int(lines_dict['SEED'])
                 except ValueError:
                     raise ValueError("Seed should be a valid integer!")
             final_validation: Config = Config(

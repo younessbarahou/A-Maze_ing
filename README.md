@@ -10,7 +10,7 @@
 3. Solves the maze using **Breadth-First Search (BFS)** to find the shortest path from entry to exit.
 4. Displays the maze visually in the terminal.
 
-The maze may be configured as **perfect** (exactly one path between any two cells) or imperfect (multiple paths allowed). The visual representation always includes a hidden **"42"** pattern drawn by fully closed cells.
+The maze may be configured as **perfect** (exactly one path between any two cells) or imperfect (multiple paths allowed). The visual representation always includes a **"42"** pattern drawn by fully closed cells when the maze size is Compatible.
 
 
 ## Instructions
@@ -18,8 +18,9 @@ The maze may be configured as **perfect** (exactly one path between any two cell
 ### Requirements
 
 - Python **3.10** or later
-- `pip` (or `uv`, `pipx`) for dependency management
+- `poetry` for dependency management
 - `flake8` and `mypy` for linting
+- `pydantic` for validation
 
 ### Installation
 
@@ -30,7 +31,7 @@ make install
 ### Running the Program
 
 # Run with a configuration file
-python3 main.py config.txt
+python3 a_maze_ing.py config.txt
 
 # Or via Makefile
 make run
@@ -164,7 +165,7 @@ gen.generate_maze()
 # Access the solution path
 path = gen.solution      # List of (x, y) tuples
 directions = gen.path_directions()  # List of 'N', 'E', 'S', 'W'
-
+```
 
 
 
@@ -198,10 +199,10 @@ directions = gen.path_directions()  # List of 'N', 'E', 'S', 'W'
 
 ### Tools Used
 
-- **Git** for version control and collaboration
+- **Git and github** for version control and collaboration
 - **VS Code** with Pylance for type checking
 - **mypy** and **flake8** for static analysis and linting
-
+- **pydantic** for config validation
 ---
 
 ## Resources

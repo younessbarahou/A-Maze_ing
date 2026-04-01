@@ -23,7 +23,7 @@ class Maze:
         """ initialize a maze """
         self.rows = rows
         self.columns = columns
-        self.maze_rep: List[List[Cell]] = []
+        self.maze_grid: List[List[Cell]] = []
 
     def grid_setup(self) -> List[List[Cell]]:
         """ Generates the initial grid of the maze """
@@ -35,9 +35,9 @@ class Maze:
                 temp: Cell = Cell()
                 row.append(temp)
                 jndex += 1
-            self.maze_rep.append(row)
+            self.maze_grid.append(row)
             index += 1
-        return self.maze_rep
+        return self.maze_grid
 
 
 class MazeGenerator:

@@ -1,13 +1,13 @@
 .PHONY: install run debug clean lint lint-strict
  
 install:
-	pip install -r requirements.txt
+	python -m poetry install
  
 run:
-	python3 main.py
+	python -m poetry run python3 a_maze_ing.py
  
 debug:
-	python -m pdb main.py
+	python -m pdb a_maze_ing.py
  
 clean:
 	rm -rf __pycache__ .mypy_cache .pytest_cache
