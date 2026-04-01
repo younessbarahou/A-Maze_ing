@@ -1,6 +1,6 @@
 import os
-import sys
 import random
+import sys
 from pydantic import ValidationError
 from typing import List, Dict, Tuple, Optional
 from parsing import parser
@@ -169,7 +169,12 @@ def main() -> None:
     Returns:
         None
     """
-    maze_confg = parser("config.txt")
+    try:
+        maze_confg = parser("config.txt")
+    except (ValidationError, Exception) as e:
+        print(e)
+        sys.exit(1)
+
     maze_obj = MazeGenerator(
         maze_confg.Height,
         maze_confg.Width,
@@ -196,11 +201,17 @@ def main() -> None:
     path = bfs_solve(maze) or []
 
     directions = path_to_directions(path)
-    with open(maze_file, 'a') as f:
-        f.write('\n' + directions + '\n')
+    try:
+        with open(maze_file, 'a') as f:
+            f.write('\n' + directions + '\n')
+    except Exception as e:
+        print(e)
+        sys.exit(1)
 
     while True:
         clear()
+
+        print(render_maze(maze, theme_index, show_path, path))
 
         if maze_confg.Height < 12 or maze_confg.Width < 12:
             print(
@@ -209,7 +220,6 @@ def main() -> None:
             )
         else:
             pass
-        print(render_maze(maze, theme_index, show_path, path))
 
         print_menu()
 
@@ -221,8 +231,12 @@ def main() -> None:
             maze = load_maze(maze_file)
             path = bfs_solve(maze) or []
             directions = path_to_directions(path)
-            with open(maze_file, 'a') as f:
-                f.write('\n' + directions + '\n')
+            try:
+                with open(maze_file, 'a') as f:
+                    f.write('\n' + directions + '\n')
+            except Exception as e:
+                print(e)
+                sys.exit(1)
 
         # 2. show/hide the path
         elif choice == "2":
@@ -244,5 +258,5 @@ def main() -> None:
 if __name__ == "__main__":
     try:
         main()
-    except (ValidationError, Exception) as e:
+    except Exception as e:
         print(e)
