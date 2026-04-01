@@ -60,11 +60,13 @@ def build_grid(
                 pry = py * 2 + 1
                 grid[(ry + pry)//2][(rx + prx)//2] = PATH
 
-    # 4. entry & exit (always on top)
-    ex, ey = maze.entry
-    fx, fy = maze.exit
-    grid[ey*2+1][ex*2+1] = ENTRY
-    grid[fy*2+1][fx*2+1] = EXIT
+    # entry
+    ey, ex = maze.entry
+    grid[ey * 2 + 1][ex * 2 + 1] = ENTRY
+
+    # exit
+    ey, ex = maze.exit
+    grid[ey * 2 + 1][ex * 2 + 1] = EXIT
 
     return grid
 
