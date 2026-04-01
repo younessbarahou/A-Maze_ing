@@ -1,4 +1,5 @@
 import os
+import sys
 import random
 from pydantic import ValidationError
 from typing import List, Dict, Tuple, Optional
@@ -62,6 +63,7 @@ THEMES: List[Dict[str, Tuple[int, int, int] | str]] = [
         "path": (100, 200, 255),
         "entry": (80, 255, 120),
         "exit": (255, 100, 100),
+        "special": (255, 255, 0),
     },
     {
         "name": "Red",
@@ -70,6 +72,7 @@ THEMES: List[Dict[str, Tuple[int, int, int] | str]] = [
         "path": (255, 180, 50),
         "entry": (100, 255, 100),
         "exit": (50, 150, 255),
+        "special": (255, 255, 0),
     },
     {
         "name": "Green",
@@ -78,6 +81,7 @@ THEMES: List[Dict[str, Tuple[int, int, int] | str]] = [
         "path": (150, 255, 100),
         "entry": (255, 230, 50),
         "exit": (255, 80, 80),
+        "special": (255, 255, 0),
     },
 ]
 
@@ -123,7 +127,8 @@ def render_maze(
 
             elif cell == "•":
                 result += fg(*theme["path"]) + bg(*theme["empty"]) + "··"
-
+            elif cell == "#":
+                result += fg(*theme["special"]) + bg(*theme["empty"]) + "##"
             else:
                 result += fg(*theme["empty"]) + bg(*theme["empty"]) + "  "
 
@@ -196,6 +201,14 @@ def main() -> None:
 
     while True:
         clear()
+
+        if maze_confg.Height < 12 or maze_confg.Width < 12:
+            print(
+                "42 Pattern is omitted!\n maze size is too small.",
+                file=sys.stderr
+            )
+        else:
+            pass
         print(render_maze(maze, theme_index, show_path, path))
 
         print_menu()

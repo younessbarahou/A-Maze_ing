@@ -1,14 +1,14 @@
 .PHONY: install run debug clean lint lint-strict
  
 install:
-	python -m poetry install
+	python3 -m poetry install
  
 run:
-	python -m poetry run python3 a_maze_ing.py
+	python3 -m poetry run python3 a_maze_ing.py
  
 debug:
-	python -m pdb a_maze_ing.py
- 
+	python3 -m pdb a_maze_ing.py
+
 clean:
 	rm -rf __pycache__ .mypy_cache .pytest_cache
 	rm -rf mazegen/__pycache__
