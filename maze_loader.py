@@ -22,15 +22,6 @@ class Maze:
         height: int, grid: List[list[int]], entry: Tuple[int, int],
         exit_: Tuple[int, int]
     ):
-        """Initializes a Maze object with dimensions, grid, entry, and exit.
-
-        Args:
-            width (int): Width of the maze grid.
-            height (int): Height of the maze grid.
-            grid (List[List[int]]): 2D list of integers.
-            entry (Tuple[int, int]): (x, y) coordinates entry point.
-            exit_ (Tuple[int, int]): (x, y) coordinates exit point.
-        """
         self.width = width
         self.height = height
         self.grid = grid
@@ -41,8 +32,8 @@ class Maze:
 def load_maze(filename: str) -> Maze:
     """Loads a maze from a text file and constructs a Maze object.
 
-    The file format should contain the maze grid as hexadecimal digits followed
-    by an empty line, and then the entry and exit coordinates (x,y).
+    The generator writes coordinates as (row, col) i.e. (y, x).
+    We convert them to (x, y) = (col, row) for the rest of the system.
 
     Args:
         filename (str): Path to the maze file to load.
@@ -54,13 +45,13 @@ def load_maze(filename: str) -> Maze:
     with open(filename, "r") as f:
         lines = [line.strip() for line in f.readlines()]
 
-    # find the empty line ('end')
+    # find the empty line
     empty_index = lines.index("")
 
     grid_lines = lines[:empty_index]
     cordinates = lines[empty_index + 1:]
 
-    # bulding the grid (maze)
+    # building the grid (maze)
     grid = []
     for line in grid_lines:
         row = []
@@ -71,10 +62,13 @@ def load_maze(filename: str) -> Maze:
     height = len(grid)
     width = len(grid[0])
 
-    # entry & exit
-    ex, ey = map(int, cordinates[0].split(","))
-    gx, gy = map(int, cordinates[1].split(","))
+    ey, ex = map(int, cordinates[0].split(","))
+    gy, gx = map(int, cordinates[1].split(","))
+
+    grid[ey][ex] = 0
+    grid[gy][gx] = 0
 
     entry: Tuple[int, int] = (ex, ey)
     exit_: Tuple[int, int] = (gx, gy)
+
     return Maze(width, height, grid, entry, exit_)
