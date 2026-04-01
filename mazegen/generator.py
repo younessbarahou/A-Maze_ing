@@ -146,11 +146,13 @@ class MazeGenerator:
                 )
             ):
                 continue
-            if east:
+            if east and maze_grid[rand_row][rand_col + 1].reserved_42 is False:
                 maze_grid[rand_row][rand_col].east = False
                 maze_grid[rand_row][rand_col + 1].west = False
                 ten_percent -= 1
-            elif south:
+            elif (
+                south and not maze_grid[rand_row + 1][rand_col].reserved_42
+            ):
                 maze_grid[rand_row][rand_col].south = False
                 maze_grid[rand_row + 1][rand_col].north = False
                 ten_percent -= 1

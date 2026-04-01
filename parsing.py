@@ -85,7 +85,7 @@ def parser(config_file: str) -> Config:
                 line[0] = line[0].strip()
                 line[1] = line[1].strip()
             lines_dict: Dict[str, str] = {
-                line[0]: line[1] for line in splitted_lines}
+                line[0].upper(): line[1] for line in splitted_lines}
             for key in lines_dict:
                 if key in mandatory_keys:
                     mandatory_keys[key] = True
