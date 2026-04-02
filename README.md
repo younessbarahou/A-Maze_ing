@@ -46,12 +46,12 @@ Lines beginning with `#` are treated as comments and ignored.
 ### Mandatory Keys
 
 
-| `WIDTH` | Number of cells horizontally | `WIDTH=20` |
-| `HEIGHT` | Number of cells vertically | `HEIGHT=15` |
+| `WIDTH` | Number of cells horizontally | `WIDTH=20` | `Minimum` = 2
+| `HEIGHT` | Number of cells vertically | `Minimum` = 2 | `HEIGHT=15` |
 | `ENTRY` | Entry cell coordinates `(x,y)` | `ENTRY=0,0` |
 | `EXIT` | Exit cell coordinates `(x,y)` | `EXIT=19,14` |
 | `OUTPUT_FILE` | Path of the output maze file | `OUTPUT_FILE=maze.txt` |
-| `PERFECT` | Whether to generate a perfect maze | `PERFECT=True` |
+| `PERFECT` | Whether to generate a perfect maze | `PERFECT=True` | True or False
 
 ### Optional Keys
 
@@ -73,6 +73,7 @@ SEED=42
 
 All error cases are handled gracefully: invalid keys, out-of-bounds coordinates, missing mandatory fields, bad types, etc. The program never crashes unexpectedly and always prints a clear error message.
 
+In case of entering duplicated keys , the program will adopt the latest value.
 ---
 
 ## Output File Format

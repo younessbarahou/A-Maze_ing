@@ -141,7 +141,7 @@ class MazeGenerator:
             if (
                 maze_grid[rand_row][rand_col].reserved_42 or
                 (
-                    maze_grid[rand_row][rand_col + 1].reserved_42 or
+                    maze_grid[rand_row][rand_col + 1].reserved_42 and
                     maze_grid[rand_row + 1][rand_col].reserved_42
                 )
             ):

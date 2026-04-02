@@ -169,11 +169,7 @@ def main() -> None:
     Returns:
         None
     """
-    try:
-        maze_confg = parser("config.txt")
-    except (ValidationError, Exception) as e:
-        print(e)
-        sys.exit(1)
+    maze_confg = parser("config.txt")
 
     maze_obj = MazeGenerator(
         maze_confg.Height,
@@ -201,12 +197,8 @@ def main() -> None:
     path = bfs_solve(maze) or []
 
     directions = path_to_directions(path)
-    try:
-        with open(maze_file, 'a') as f:
-            f.write('\n' + directions + '\n')
-    except Exception as e:
-        print(e)
-        sys.exit(1)
+    with open(maze_file, 'a') as f:
+        f.write(directions)
 
     while True:
         clear()
@@ -231,12 +223,8 @@ def main() -> None:
             maze = load_maze(maze_file)
             path = bfs_solve(maze) or []
             directions = path_to_directions(path)
-            try:
-                with open(maze_file, 'a') as f:
-                    f.write('\n' + directions + '\n')
-            except Exception as e:
-                print(e)
-                sys.exit(1)
+            with open(maze_file, 'a') as f:
+                f.write(directions)
 
         # 2. show/hide the path
         elif choice == "2":
@@ -258,5 +246,9 @@ def main() -> None:
 if __name__ == "__main__":
     try:
         main()
+    except (
+        ValidationError, ValueError, FileNotFoundError, PermissionError
+    ) as e:
+        print(e)
     except Exception as e:
         print(e)
