@@ -47,13 +47,11 @@ def build_grid(
             grid[ry][rx] = EMPTY
 
             if x + 1 < maze.width:
-                if (not (maze.grid[y][x] & WALL_EAST)
-                    and maze.grid[y][x + 1] != 15):
+                if not (maze.grid[y][x] & WALL_EAST):
                     grid[ry][rx + 1] = EMPTY
 
             if y + 1 < maze.height:
-                if (not (maze.grid[y][x] & WALL_SOUTH)
-                        and maze.grid[y + 1][x] != 15):
+                if not (maze.grid[y][x] & WALL_SOUTH):
                     grid[ry + 1][rx] = EMPTY
 
     # 2. mark 42 cells

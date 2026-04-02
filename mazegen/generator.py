@@ -172,10 +172,10 @@ class MazeGenerator:
             raise ValueError("Exit coordinates are in 42 pattern!")
         maze_grid[self.entry[0]][self.entry[1]].entry = True
         maze_grid[self.exit[0]][self.exit[1]].exit = True
-        base_row: int = 0
-        base_column: int = 0
+        base_row: int = self.entry[0]
+        base_column: int = self.entry[1]
         stack_holder: List[Tuple[int, int]] = [(base_row, base_column)]
-        maze_grid[0][0].visited = True
+        maze_grid[base_row][base_column].visited = True
         while stack_holder:
             north: Tuple[int, int] = (-1, -1)
             east: Tuple[int, int] = (-1, -1)
@@ -214,7 +214,8 @@ class MazeGenerator:
                     east = (row, column + 1)
                 possible_dir: List[Tuple[int, int]] = [
                     north, south, east, west]
-                possible_dir = [p for p in possible_dir if p[0] != -1]
+                possible_dir = [
+                    p for p in possible_dir if p[0] != -1 and p[1] != -1]
                 decision = choice(possible_dir)
                 if decision == north:
                     maze_grid[row][column].north = False

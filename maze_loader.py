@@ -65,9 +65,6 @@ def load_maze(filename: str) -> Maze:
     ey, ex = map(int, cordinates[0].split(","))
     gy, gx = map(int, cordinates[1].split(","))
 
-    grid[ey][ex] = 0
-    grid[gy][gx] = 0
-
     entry: Tuple[int, int] = (ex, ey)
     exit_: Tuple[int, int] = (gx, gy)
 
